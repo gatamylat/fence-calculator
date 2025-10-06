@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор забора</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .unit {
+            color: #999;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-title {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .result-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .result-label {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            color: #333;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .result-unit {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .diagram {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .diagram-title {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            margin-top: 10px;
+        }
+        
+        .picket {
+            width: 15px;
+            height: 40px;
+            background: #764ba2;
+            border-radius: 2px;
+        }
+        
+        .gap {
+            height: 40px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                #e0e0e0 2px,
+                #e0e0e0 4px
+            );
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔨 Калькулятор забора</h1>
+        <p class="subtitle">Расчёт зазоров для штакетника</p>
+        
+        <div class="input-group">
+            <label for="picketWidth">Ширина штакетника:</label>
+            <input type="number" id="picketWidth" value="10" step="0.1" min="0.1">
+            <div class="unit">сантиметры (см)</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="distanceBetweenPosts">Расстояние между столбами:</label>
+            <input type="number" id="distanceBetweenPosts" step="0.1" min="0.1" placeholder="Например: 200">
+            <div class="unit">сантиметры (см)</div>
+        </div>
+        
+        <button onclick="calculate()">Рассчитать</button>
+        
+        <div class="result" id="result">
+            <div class="result-title">✅ Результат расчёта</div>
+            
+            <div class="result-item">
+                <div class="result-label">Зазор между штакетниками:</div>
+                <div>
+                    <span class="result-value" id="gapResult">-</span>
+                    <span class="result-unit">см</span>
+                </div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Количество штакетников:</div>
+                <div>
+                    <span class="result-value" id="countResult">-</span>
+                    <span class="result-unit">шт</span>
+                </div>
+            </div>
+            
+            <div class="diagram">
+                <div class="diagram-title">Схема расположения:</div>
+                <div class="visual" id="visual"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function calculate() {
+            const picketWidth = parseFloat(document.getElementById('picketWidth').value);
+            const distance = parseFloat(document.getElementById('distanceBetweenPosts').value);
+            
+            if (!picketWidth || !distance || picketWidth <= 0 || distance <= 0) {
+                alert('Пожалуйста, введите корректные значения!');
+                return;
+            }
+            
+            if (picketWidth >= distance) {
+                alert('Ширина штакетника не может быть больше расстояния между столбами!');
+                return;
+            }
+            
+            // Находим оптимальное количество штакетников
+            let bestCount = 0;
+            let bestGap = 0;
+            let minDiff = Infinity;
+            
+            // Перебираем возможное количество штакетников
+            for (let count = 1; count <= Math.floor(distance / picketWidth); count++) {
+                // Рассчитываем зазор для данного количества
+                const totalPicketWidth = count * picketWidth;
+                const remainingSpace = distance - totalPicketWidth;
+                const gaps = count + 1; // зазоры по краям и между штакетниками
+                const gap = remainingSpace / gaps;
+                
+                // Ищем вариант, где зазор близок к ширине штакетника или меньше
+                // Предпочитаем больше штакетников с меньшими зазорами
+                const diff = Math.abs(gap - picketWidth * 0.5);
+                
+                if (gap > 0 && gap <= picketWidth * 1.5 && diff < minDiff) {
+                    minDiff = diff;
+                    bestCount = count;
+                    bestGap = gap;
+                }
+            }
+            
+            // Если не нашли подходящий вариант, берём максимальное количество
+            if (bestCount === 0) {
+                bestCount = Math.floor(distance / (picketWidth * 1.5));
+                const totalPicketWidth = bestCount * picketWidth;
+                const remainingSpace = distance - totalPicketWidth;
+                bestGap = remainingSpace / (bestCount + 1);
+            }
+            
+            // Отображаем результаты
+            document.getElementById('gapResult').textContent = bestGap.toFixed(1);
+            document.getElementById('countResult').textContent = bestCount;
+            
+            // Создаём визуализацию
+            const visual = document.getElementById('visual');
+            visual.innerHTML = '';
+            
+            // Ограничиваем количество для визуализации
+            const visualCount = Math.min(bestCount, 8);
+            
+            for (let i = 0; i < visualCount; i++) {
+                const gap = document.createElement('div');
+                gap.className = 'gap';
+                gap.style.width = '5px';
+                visual.appendChild(gap);
+                
+                const picket = document.createElement('div');
+                picket.className = 'picket';
+                visual.appendChild(picket);
+            }
+            
+            const finalGap = document.createElement('div');
+            finalGap.className = 'gap';
+            finalGap.style.width = '5px';
+            visual.appendChild(finalGap);
+            
+            if (bestCount > 8) {
+                const note = document.createElement('div');
+                note.style.marginTop = '10px';
+                note.style.fontSize = '11px';
+                note.style.color = '#999';
+                note.textContent = '(показаны первые 8 штакетников)';
+                visual.appendChild(note);
+            }
+            
+            // Показываем результат
+            document.getElementById('result').classList.add('show');
+        }
+        
+        // Расчёт при нажатии Enter
+        document.getElementById('distanceBetweenPosts').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+        
+        document.getElementById('picketWidth').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+    </script>
+</body>
+</html>
