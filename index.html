@@ -213,6 +213,12 @@
             <div class="unit">сантиметры (см)</div>
         </div>
         
+        <div class="input-group">
+            <label for="desiredGap">Желаемый зазор:</label>
+            <input type="number" id="desiredGap" step="0.1" min="0.1" placeholder="Например: 2">
+            <div class="unit">сантиметры (см)</div>
+        </div>
+        
         <button onclick="calculate()">Рассчитать</button>
         
         <div class="result" id="result">
@@ -245,8 +251,9 @@
         function calculate() {
             const picketWidth = parseFloat(document.getElementById('picketWidth').value);
             const distance = parseFloat(document.getElementById('distanceBetweenPosts').value);
+            const desiredGap = parseFloat(document.getElementById('desiredGap').value);
             
-            if (!picketWidth || !distance || picketWidth <= 0 || distance <= 0) {
+            if (!picketWidth || !distance || !desiredGap || picketWidth <= 0 || distance <= 0 || desiredGap <= 0) {
                 alert('Пожалуйста, введите корректные значения!');
                 return;
             }
@@ -256,7 +263,7 @@
                 return;
             }
             
-            // Находим оптимальное количество штакетников
+            // Находим оптимальное количество штакетников исходя из желаемого зазора
             let bestCount = 0;
             let bestGap = 0;
             let minDiff = Infinity;
@@ -269,23 +276,14 @@
                 const gaps = count + 1; // зазоры по краям и между штакетниками
                 const gap = remainingSpace / gaps;
                 
-                // Ищем вариант, где зазор близок к ширине штакетника или меньше
-                // Предпочитаем больше штакетников с меньшими зазорами
-                const diff = Math.abs(gap - picketWidth * 0.5);
+                // Ищем вариант, где зазор максимально близок к желаемому
+                const diff = Math.abs(gap - desiredGap);
                 
-                if (gap > 0 && gap <= picketWidth * 1.5 && diff < minDiff) {
+                if (gap > 0 && diff < minDiff) {
                     minDiff = diff;
                     bestCount = count;
                     bestGap = gap;
                 }
-            }
-            
-            // Если не нашли подходящий вариант, берём максимальное количество
-            if (bestCount === 0) {
-                bestCount = Math.floor(distance / (picketWidth * 1.5));
-                const totalPicketWidth = bestCount * picketWidth;
-                const remainingSpace = distance - totalPicketWidth;
-                bestGap = remainingSpace / (bestCount + 1);
             }
             
             // Отображаем результаты
@@ -336,6 +334,12 @@
         });
         
         document.getElementById('picketWidth').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+        
+        document.getElementById('desiredGap').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 calculate();
             }
